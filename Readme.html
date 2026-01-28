@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MysticThumbs example plugin</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <style type="text/css" id="mainstyle">
+        body {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>MysticThumbs example plugin</h1>
+    <h2>Add new image formats to MysticThumbs</h2>
+    <h2>How to use</h2>
+    A Visual Studio 2022 project is supplied for convenience to get you up and running. This could be adapted to older versions if required as it is very rudimentary.<br />
+    Use this example project as a template to make your own.<br />
+    <br />
+    Make one plugin project for each file type.<br />
+    If you require different file types create new plugins for each.<br />
+    You register each file format extension necessary for the file format, so you can for example register multiple extensions such as JPEG
+    has with .jpg, .jpeg etc. you could register extensions .mtp, .mtp1, .mtp2 etc.<br />
+    <br />
+    The core interface that must be implemented is the IMysticThumbsPlugin interface. In
+    this example the class CExamplePlugin implements this.<br />
+    <br />
+    MysticThumbs can request any number of these objects so it is very important
+    that you do not use any static variables that could cause conflicts amongst
+    concurrent running objects. Encapsulate everything in your class.<br />
+    <br />
+    The documentation and comments in the MysticThumbsPlugin.h header file specify all
+    the required information that you will need to successfully implement your own
+    plugin.<br />
+    <br />
+    For the purposes of the example, we use the .mtp extension (which is actually the
+    extension used for MysticThumbs plugin DLLs) and generate a test pattern image dynamically
+    of the requested thumbnail size.<br />
+    <br />
+    <h2>IMysticThumbsPlugin::Ping and IMysticThumbsPlugin::GenerateImage methods</h2>
+    This is the meat of the plugin.<br />
+    <br />
+    In a typical plugin you will read from the passed IStream interface pointer that
+    points to the head of the file being thumbnailed.<br />
+    The Ping method parses the file and returns information about the dimensions of the image.<br />
+    The GenerateImage method reads the file and generates the thumbnail and returns the image data <strong>un-scaled</strong>.<br />
+    It is not usually necessary to scale your image, and you can simply read and pass
+    the full image back, this will yield the fastest and best results. MysticThumbs and Explorer will take care of scaling appropriate to control
+    panel and operating system requirementes. The desiredSize and flags parameters
+    are merely hints
+    should you require them.<br />
+    <br />
+    If however, you are generating a thumbnail of an abstract nature, say for
+    example a sound saveform, then your image could be of any arbitary size, and the
+    desiredSize parameter can be used to determine the best size to render to.<br />
+    <br />
+    The <strong>desiredSize</strong> parameter represents the size of the thumbnail that Explorer is
+    requesting at the time, this could be for example 32, 48, 96, 256 or even very
+    large if requesting for preview purposes. It is the <strong>width </strong>in
+    pixels of the requested thumbnail.<br />
+    The <strong>flags</strong> parameter gives you hints as
+    to what the control panel settings are for your file extension, such as
+    transparency, embedded thumbnail and scaling settings. This may be expanded upon
+    in future releases.<br />
+    <br />
+    <h2>Building</h2>
+    Ensure you build for both x86 and x64 platforms. This ensures compatibility with 32 bit apps on 64 bit Windows.<br />
+    The example project already has the required project set up.<br />
+    <br />
+    The x86 plugin should end with 32.mtp and the x64 plugin should end with 64.mtp, for example ExamplePlugin32.mtp and ExamplePlugin64.mtp.<br />
+    <br />
+    Place both these files in a plugins folder in the appropriate Plugins folder.
+    <br />
+    Shortcut buttons are available in the control panel plugins dialog that will open the folder for either the current user only (if using a shared machine and you want to either test or use a plugin only for yourself), or for all users, which will be the Plugins folder in the install folder.<br />
+    Installing plugins for all users in the install folder will likely require administrator priveleges.<br />
+    <br />
+    Register the plugin in the <a target="_blank" href="https://mysticcoder.net/mysticthumbshelp/index.htm?context=60">MysticThumbs control panel</a>.<br />
+    <h2>Using</h2>
+    Use the <a target="_blank" href="https://mysticcoder.net/mysticthumbshelp/index.htm?context=60#plugins">Plugins button</a>, which opens the
+    <a target="_blank" href="https://mysticcoder.net/mysticthumbshelp/index.htm?context=150">Plugins dialog</a> where you can register and unregister plugins after installing them into the appropriate folder.<br />
+    <ul>
+        <li>Select the plugin from the drop list.</li>
+        <li>Use the Register button to install the required Explorer hooks for the file extensions assigned to the plugin.</li>
+        <li>Use the Unregister button to remove the hooks.</li>
+    </ul>
+    If the plugin loads successfully you will find it in the MysticThumbs control panel <a target="_blank" href="https://mysticcoder.net/mysticthumbshelp/index.htm?context=60#fileformat">File Format</a> drop list
+    under an entry corresponding to the name you return in the method IMysticThumbsPlugin::GetName().<br />
+    You can now use it just as you would any other natively supported file format
+    with all the benefits of the control panel options.<br />
+    <br />
+    <h2>To test this example plugin:</h2>
+    <ul>
+        <li>
+            Build both Win32 and x64 Release configurations and place the resulting .mtp
+            files in the MysticThumbs plugin folder.<br />
+        </li>
+        <li>Create a dummy, empty file on your desktop called test.mtp</li>
+        <li>Restart Explorer, for example using task manager.</li>
+        <li>
+            Provided the plugin loaded you should see the test pattern display for your
+            test.mtp file that looks like this:
+        </li>
+    </ul>
+    <img src="TestThumbnail.jpg" />
+    <p>
+        You now have all the MysticThumbs thumbnail options available for your file format!
+    </p>
+
+</body>
+</html>
