@@ -71,7 +71,7 @@ private:
             DWORD dwSize = sizeof(DWORD);
 
             LSTATUS status = RegQueryValueExW(hKey, L"AlternateColorScheme", nullptr, nullptr, (LPBYTE)&dwValue, &dwSize);
-            assert(status == ERROR_SUCCESS);
+            //assert(status == ERROR_SUCCESS); // don't do this - because it might not exist! :p
             if(status == ERROR_SUCCESS) {
                 alternateColorSchemeEnabled = (dwValue != 0);
                 if(hwndDlg) {
