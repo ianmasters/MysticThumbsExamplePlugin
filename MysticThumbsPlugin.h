@@ -45,7 +45,6 @@
 #include <Windows.h>
 #include <WinCodec.h> // required for VERSION 3
 
-
 /////////////////////////////////////////////////////////////////////////////
 // 
 // Logging interface
@@ -119,6 +118,8 @@ struct MysticThumbsPluginPing
 };
 
 
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Plugin context passed to plugin initialization and valid for
@@ -148,6 +149,15 @@ struct IMysticThumbsPluginContext : public IMysticThumbsLog
     /// </summary>
     /// <returns>The ping struct / interface</returns>
     virtual _Check_return_ const MysticThumbsPluginPing* GetPing() const = 0;
+
+    /// <summary>
+    /// Get the root key the plugin should use to save/load configuration settings to the registry.
+    /// Each user gets their own registry settings on a multi-user machine.
+    /// The returned handle should be closed after immediate use with RegCloseKey() to avoid open handles.
+    /// An easier way is to use ATL CRegKey or similar RAII wrapper to manage the handle lifetime in a local context. See the example plugin.
+    /// </summary>
+    /// <returns>A registry HKEY root key where your plugin config is stored. NULL if error.</returns>
+    virtual _Check_return_ HKEY GetPluginRegistryRootKey() const = 0;
 };
 
 
@@ -207,11 +217,6 @@ struct MysticThumbsPluginGenerateParams {
     MysticThumbsPluginFlags flags;	// flags
 };
 
-struct MysticThumbsPluginConfigureInfo {
-    unsigned int structSize = sizeof(MysticThumbsPluginConfigureInfo);	// sizeof this struct for versioning and future expansion
-
-    HWND hParentDialog;             // parent window for any dialog boxes
-};
 
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -227,10 +232,10 @@ public:
     virtual void Destroy() = 0;
 
     /// Identify this plugin by name
-    virtual _Notnull_ LPCWSTR GetName() = 0;
+    virtual _Notnull_ LPCWSTR GetName() const = 0;
 
     // Identify plugin by GUID for uniqueness
-    virtual _Notnull_ LPCGUID GetGuid() = 0;
+    virtual _Notnull_ LPCGUID GetGuid() const = 0;
 
     // New in VERSION 4
 
@@ -239,7 +244,7 @@ public:
     /// Use /n for new lines as needed.
     /// </summary>
     /// <returns>The string, can be, but ideally not be, nullptr</returns>
-    virtual _Notnull_ LPCWSTR GetDescription() = 0;
+    virtual _Notnull_ LPCWSTR GetDescription() const = 0;
 
     /// <summary>
     /// Get the author of this plugin.
@@ -247,13 +252,13 @@ public:
     /// Use /n for new lines as needed.
     /// </summary>
     /// <returns>The string, can be, but ideally not be, nullptr</returns>
-    virtual _Notnull_ LPCWSTR GetAuthor() = 0;
+    virtual _Notnull_ LPCWSTR GetAuthor() const = 0;
 
     // List extensions supported
-    virtual unsigned int GetExtensionCount() = 0;
+    virtual unsigned int GetExtensionCount() const = 0;
 
     /// Get an extension by index.
-    virtual _Notnull_ LPCWSTR GetExtension(_In_ unsigned int index) = 0;
+    virtual _Notnull_ LPCWSTR GetExtension(_In_ unsigned int index) const = 0;
 
     /// Ping an image to report it's information such as dimensions and bit depth.
     /// Fill in fields that are relevant. If no ping information can be determined do nothing and return false.
@@ -278,7 +283,7 @@ public:
     /// Allows the plugin to be configured if needed by opening a modal dialog box or similar and storing settings in the registry or a file etc.
     /// </summary>
     /// <returns>false if nothing was done or configuration is not supported. true if something was done.</returns>
-    virtual bool Configure(_In_ MysticThumbsPluginConfigureInfo& configInfo) = 0;
+    virtual bool Configure(_In_ HWND hWndParent) = 0;
 
     /// Prior to VERSION 3 this method did not exist so expect for it not to be found.
     /// In VERSION 3 it is the only option.
@@ -317,5 +322,13 @@ typedef bool (*MTP_Shutdown)();
 // The context is valid for the lifetime of the plugin instance.
 typedef IMysticThumbsPlugin* (*MTP_CreateInstance)(_In_ IMysticThumbsPluginContext* context);
 
+/// <summary>
+/// Optional function to prevent loading this plugin entirely.
+/// If this function exists and returns true, the plugin will not be loaded.
+/// This can be used to check for example if the plugin is a debug build or if certain dependencies are missing.
+/// If the function does not exist, the plugin will be loaded as normal.
+/// <param name="isDebugProcess">Indicates if MysticThumbs or the loader process is a debug build. Can be used to prevent loading debug plugins in release builds and vice versa.</param>
+/// </summary>
+typedef bool (*MTP_PreventLoading)(bool isDebugProcess);
 
 #endif // _MysticThumbsPlugin_h_

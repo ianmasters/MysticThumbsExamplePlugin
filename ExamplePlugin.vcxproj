@@ -69,25 +69,25 @@
     <TargetExt>.mtp</TargetExt>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)$(Configuration)\Plugins\$(PlatformArchitecture)\</OutDir>
+    <OutDir>$(APPDATA)\MysticThumbs\Plugins\$(Configuration)\$(PlatformArchitecture)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.mtp</TargetExt>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)$(Configuration)\Plugins\$(PlatformArchitecture)\</OutDir>
+    <OutDir>$(APPDATA)\MysticThumbs\Plugins\$(Configuration)\$(PlatformArchitecture)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.mtp</TargetExt>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)$(Configuration)\Plugins\$(PlatformArchitecture)\</OutDir>
+    <OutDir>$(APPDATA)\MysticThumbs\Plugins\$(PlatformArchitecture)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.mtp</TargetExt>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <IntDir>$(ProjectDir)intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)$(Configuration)\Plugins\$(PlatformArchitecture)\</OutDir>
+    <OutDir>$(APPDATA)\MysticThumbs\Plugins\$(PlatformArchitecture)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>

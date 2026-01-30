@@ -22,10 +22,6 @@ static const LPCWSTR s_extensions[] = { L".mtp" };
 // {4501A6B8-65EF-42A4-8AB1-F5F9FB23A91F}
 static const GUID s_guid = { 0x4501a6b8, 0x65ef, 0x42a4, { 0x8a, 0xb1, 0xf5, 0xf9, 0xfb, 0x23, 0xa9, 0x1f } };
 
-// Where your plugin settings will be stored in the registry appended with s_name / the name of your plugin
-// It is HIGHLY recommended to use this path because MysticThumbs has built-in backup and restore of plugin settings under this key and everything is stored in the same registry name space.
-constexpr LPCWSTR SZ_REGISTRY_PLUGINS_ROOT_KEY = L"Software\\MysticCoder\\MysticThumbs\\Plugins";
-
 // Store the module handle from DllMain for use in dialogs
 static HMODULE g_hModule;
 
@@ -56,49 +52,51 @@ private:
     // It doesn't need to be done this way, this example just keeps the configuration code and settings in one place.
     struct PluginConfig
     {
+        const IMysticThumbsPluginContext* context;
         bool alternateColorSchemeEnabled{};
+
+        PluginConfig(CExamplePlugin* plugin)
+        {
+            context = plugin->GetContext();
+            assert(context);
+        }
 
         void Load(HWND hwndDlg = nullptr) // hwndDlg is only used in the control panel configuration, if provided the dialog controls will be updated. When loading for normal use it will be nullptr.
         {
-            // Registry path to load settings from
-            auto subKey = std::filesystem::path(SZ_REGISTRY_PLUGINS_ROOT_KEY) / s_name;
+            CRegKey hKey(context->GetPluginRegistryRootKey()); // using ATL CRegKey for safe handle management
+            if(!hKey)
+                return;
 
-            HKEY hKey;
-            if(RegOpenKeyExW(HKEY_CURRENT_USER, subKey.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-                DWORD dwValue = 0;
-                DWORD dwSize = sizeof(DWORD);
+            DWORD dwValue = 0;
+            DWORD dwSize = sizeof(DWORD);
 
-                if(RegQueryValueExW(hKey, L"AlternateColorScheme", nullptr, nullptr, (LPBYTE)&dwValue, &dwSize) == ERROR_SUCCESS) {
-                    alternateColorSchemeEnabled = (dwValue != 0);
-                    if(hwndDlg) {
-                        CheckDlgButton(hwndDlg, IDC_ALTERNATE_COLOR_SCHEME, alternateColorSchemeEnabled ? BST_CHECKED : BST_UNCHECKED);
-                    }
+            LSTATUS status = RegQueryValueExW(hKey, L"AlternateColorScheme", nullptr, nullptr, (LPBYTE)&dwValue, &dwSize);
+            assert(status == ERROR_SUCCESS);
+            if(status == ERROR_SUCCESS) {
+                alternateColorSchemeEnabled = (dwValue != 0);
+                if(hwndDlg) {
+                    CheckDlgButton(hwndDlg, IDC_ALTERNATE_COLOR_SCHEME, alternateColorSchemeEnabled ? BST_CHECKED : BST_UNCHECKED);
                 }
-
-                // Load other options using the hKey parent as required.
-
-                RegCloseKey(hKey);
             }
+
+            // Load other options using the hKey parent as required.
         }
 
         void Save(HWND hwndDlg) const
         {
-            // Registry path to load settings from
-            auto subKey = std::filesystem::path(SZ_REGISTRY_PLUGINS_ROOT_KEY) / s_name;
+            CRegKey hKey(context->GetPluginRegistryRootKey()); // using ATL CRegKey for safe handle management
+            if(!hKey)
+                return;
 
-            HKEY hKey;
-            if(RegCreateKeyExW(HKEY_CURRENT_USER, subKey.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr) == ERROR_SUCCESS) {
-                DWORD dwValue;
+            DWORD dwValue;
                 
-                dwValue = alternateColorSchemeEnabled ? 1 : 0;
-                RegSetValueExW(hKey, L"AlternateColorScheme", 0, REG_DWORD, (LPBYTE)&dwValue, sizeof(DWORD));
+            dwValue = alternateColorSchemeEnabled ? 1 : 0;
+            LSTATUS status = RegSetValueExW(hKey, L"AlternateColorScheme", 0, REG_DWORD, (LPBYTE)&dwValue, sizeof(DWORD));
+            assert(status == ERROR_SUCCESS);
 
-                // Save other options using the hKey parent has required.
-
-                RegCloseKey(hKey);
-            }
+            // Save other options using the hKey parent has required.
         }
-    } config{};
+    } config;
 
     static INT_PTR CALLBACK ConfigureDialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -111,40 +109,50 @@ protected:
 
 public:
 
-    CExamplePlugin(_In_ IMysticThumbsPluginContext* context) : context(context)
+    CExamplePlugin(_In_ IMysticThumbsPluginContext* context) : context(context), config(this)
     {
         // Called when the plugin is initially created.
         // It may not necesserally be used immediately, it may just be an object to check the interface information so be careful about allocating anything here.
     }
 
+    const IMysticThumbsPluginContext* GetContext() const
+    {
+        return context;
+    }
+
 private:
 
-    _Notnull_ LPCWSTR GetName() override
+    _Notnull_ LPCWSTR GetName() const override
     {
         return s_name;
     }
 
-    _Notnull_ LPCGUID GetGuid() override
+    _Notnull_ LPCGUID GetGuid() const override
     {
         return &s_guid;
     }
 
-    _Notnull_ LPCWSTR GetDescription() override
+    _Notnull_ LPCWSTR GetDescription() const override
     {
-        return L"Example Plugin/nGenerates procedural images for demonstration purposes./nCopyright (c) 2026 MysticCoder";
+        return L"Example Plugin"
+#ifdef DEBUG
+            L" (DEBUG)"
+#endif
+            L"/nGenerates procedural images for demonstration purposes. /nCopyright (c) 2026 MysticCoder"
+            ;
     }
 
-    _Notnull_ LPCWSTR GetAuthor() override
+    _Notnull_ LPCWSTR GetAuthor() const override
     {
         return L"MysticCoder/nmysticcoder.net";
     }
 
-    unsigned int GetExtensionCount() override
+    unsigned int GetExtensionCount() const override
     {
         return ARRAYSIZE(s_extensions);
     }
 
-    _Notnull_ LPCWSTR GetExtension(_In_ unsigned int index) override
+    _Notnull_ LPCWSTR GetExtension(_In_ unsigned int index) const override
     {
         return s_extensions[index];
     }
@@ -194,7 +202,7 @@ private:
         return true;
     };
 
-    bool Configure(_In_ MysticThumbsPluginConfigureInfo& configInfo) override
+    bool Configure(_In_ HWND hWndParentDialog) override
     {
 #ifdef _DEBUG
         context->log(L"ExamplePlugin: Configure log called");
@@ -203,7 +211,7 @@ private:
 
         INT_PTR result = DialogBoxParamW(g_hModule,
                                          MAKEINTRESOURCE(IDD_EXAMPLE_PLUGIN_CONFIGURE),
-                                         configInfo.hParentDialog,
+                                         hWndParentDialog,
                                          ConfigureDialogProc,
                                          (LPARAM)this);
 
@@ -398,6 +406,19 @@ extern "C" EXAMPLEPLUGIN_API IMysticThumbsPlugin* CreateInstance(_In_ IMysticThu
     CExamplePlugin* plugin = (CExamplePlugin*)CoTaskMemAlloc(sizeof(CExamplePlugin));
     // Placement new to initialize the object in the allocated memory.
     return new(plugin) CExamplePlugin(context);
+}
+
+// Prevent loading when in a debug process if this is not a debug build, and vice versa.
+// You can also choose to not export this function if you don't need it, or just for release builds if you always want it to load.
+// You could also check for other dependencies here if needed.
+extern "C" EXAMPLEPLUGIN_API bool PreventLoading(bool isDebugProcess)
+{
+#ifdef _DEBUG
+    bool isDebug = true;
+#else
+    bool isDebug = false;
+#endif
+    return isDebug != isDebugProcess;
 }
 
 
