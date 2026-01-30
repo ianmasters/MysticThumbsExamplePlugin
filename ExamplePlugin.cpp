@@ -134,17 +134,17 @@ private:
 
     _Notnull_ LPCWSTR GetDescription() const override
     {
-        return L"Example Plugin"
+        return
 #ifdef DEBUG
-            L" (DEBUG)"
+            L"(DEBUG)\n"
 #endif
-            L"/nGenerates procedural images for demonstration purposes. /nCopyright (c) 2026 MysticCoder"
+            L"\nExample plugin that generates procedural images for demonstration purposes.\n\nUse this plugin as a template to create your own."
             ;
     }
 
     _Notnull_ LPCWSTR GetAuthor() const override
     {
-        return L"MysticCoder/nmysticcoder.net";
+        return L"MysticCoder\nmysticcoder.net";
     }
 
     unsigned int GetExtensionCount() const override
