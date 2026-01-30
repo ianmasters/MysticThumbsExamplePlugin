@@ -19,13 +19,13 @@ The documentation and comments in the `MysticThumbsPlugin.h` header file specify
 
 For the purposes of the example, we use the .mtp extension (which is actually the extension used for MysticThumbs plugin DLLs) and generate a test pattern image dynamically of the requested thumbnail size.
 
-## IMysticThumbsPlugin::Ping and IMysticThumbsPlugin::GenerateImage methods
+## IMysticThumbsPlugin::Ping and IMysticThumbsPlugin::Generate methods
 
 This is the meat of the plugin.
 
 In a typical plugin you will read from the passed IStream interface pointer that points to the head of the file being thumbnailed.
 The Ping method parses the file and returns information about the dimensions of the image.
-The GenerateImage method reads the file and generates the thumbnail and returns the image data **un-scaled**.
+The Generate method reads the file and generates the thumbnail and returns the image data **un-scaled**.
 It is not usually necessary to scale your image, and you can simply read and pass the full image back, this will yield the fastest and best results. MysticThumbs and Explorer will take care of scaling appropriate to control panel and operating system requirements. The desiredSize and flags parameters are merely hints should you require them.
 
 If however, you are generating a thumbnail of an abstract nature, say for example a sound save form, then your image could be of any arbitrary size, and the desiredSize parameter can be used to determine the best size to render to.
