@@ -53,7 +53,7 @@ private:
     struct PluginConfig
     {
         const IMysticThumbsPluginContext* context;
-        bool alternateColorSchemeEnabled{};
+        bool alternateColorSchemeEnabled{}; // true = full image, false = a circle/ellipse for clarity that the setting works.
 
         PluginConfig(CExamplePlugin* plugin)
         {
@@ -298,18 +298,12 @@ private:
                 float r = (1 + sinf(fx * PI)) * 0.5f;
                 float g = (1 + cosf(fy * PI)) * 0.5f;
                 float b = (1 + sinf(fx * fy * PI)) * 0.5f;
-                float a = sqrtf(fx * fx + fy * fy);
+                float a = config.alternateColorSchemeEnabled ? std::abs(fx) : sqrtf(fx * fx + fy * fy);
 
                 // Fill in the channel information for this pixel
-                if(config.alternateColorSchemeEnabled) {
-                    *ptr++ = (unsigned char)(b * 255);
-                    *ptr++ = (unsigned char)(r * 255);
-                    *ptr++ = (unsigned char)(g * 255);
-                } else {
-                    *ptr++ = (unsigned char)(r * 255);
-                    *ptr++ = (unsigned char)(g * 255);
-                    *ptr++ = (unsigned char)(b * 255);
-                }
+                *ptr++ = (unsigned char)(r * 255);
+                *ptr++ = (unsigned char)(g * 255);
+                *ptr++ = (unsigned char)(b * 255);
                 *ptr++ = (unsigned char)(a * 255);
             }
         }
@@ -442,7 +436,8 @@ extern "C" EXAMPLEPLUGIN_API bool PreventLoading(bool isDebugProcess)
 #else
     bool isDebug = false;
 #endif
-    return isDebug != isDebugProcess;
+    //return isDebug != isDebugProcess;
+    return false;
 }
 
 

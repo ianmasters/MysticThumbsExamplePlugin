@@ -109,6 +109,7 @@ struct MysticThumbsPluginPing
     // Important!
     // These required sizes are hints and usually only used for procedural generation.
     // For normal ping operation return width/height as the actual image size if it is known.
+    // These can be zero - 0 - which usually means "I just want the image size"
     unsigned int requestedWidth;		// (input, hint) either the thumbnail width being requested or if isQuickView then the window width
     unsigned int requestedHeight;		// (input, hint) either the thumbnail height being requested or if isQuickView then the window height
 
@@ -155,6 +156,7 @@ struct IMysticThumbsPluginContext : public IMysticThumbsLog
     /// Each user gets their own registry settings on a multi-user machine.
     /// The returned handle should be closed after immediate use with RegCloseKey() to avoid open handles.
     /// An easier way is to use ATL CRegKey or similar RAII wrapper to manage the handle lifetime in a local context. See the example plugin.
+    /// WARNING: This can not be called until after CreateInstance() has been completed. Do not call from a plugin constructor. It will return NULL there.
     /// </summary>
     /// <returns>A registry HKEY root key where your plugin config is stored. NULL if error.</returns>
     virtual _Check_return_ HKEY GetPluginRegistryRootKey() const = 0;
