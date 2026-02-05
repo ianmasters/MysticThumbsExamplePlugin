@@ -61,6 +61,30 @@ private:
             assert(context);
         }
 
+        //////////////////////////////////////////////////////////////////////////////
+        // 
+        // An important note on saving/loading your configuration settings to the registry for compliance:
+        // 
+        // Always load settings from the registry using the context's GetPluginRegistryRootKey() as the root. This will be a unique key for each plugin and user.
+        // 
+        // This path can be used directly to save/load values or if you really need you can create subkeys for organization but it's not required.
+        // 
+        // This is VERY important for a few reasons:
+        // 
+        // - It keeps each plugin's settings separate and organized in the registry in a managed user-specific location.
+        // 
+        // - It ensures that your plugin's settings are saved in a location that is writable for the current user, especially important for non-admin users on modern versions of Windows where writing to certain registry locations may be restricted.
+        // 
+        // - It avoids conflicts with other plugins or software by using a unique registry key for your plugin.
+        // 
+        // - It allows for proper cleanup of settings when a plugin is uninstalled, as all settings are contained within a specific key that can be removed without affecting other plugins or system settings.
+        // 
+        // - If MysticThumbs adds features in the future for managing plugin settings, such as a settings UI or export/import functionality, using the designated registry root key will ensure compatibility with these features.
+        // 
+        // - VERY IMPORTANT - It ensures that your plugin's settings are included in MysticThumbs' backup and restore processes, as MysticThumbs can only backup and restore settings that are stored under the designated registry root key for each plugin.
+        // 
+        //////////////////////////////////////////////////////////////////////////////
+
         void Load(HWND hwndDlg = nullptr) // hwndDlg is only used in the control panel configuration, if provided the dialog controls will be updated. When loading for normal use it will be nullptr.
         {
             CRegKey hKey(context->GetPluginRegistryRootKey()); // using ATL CRegKey for safe handle management
