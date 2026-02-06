@@ -133,7 +133,7 @@ protected:
 
 public:
 
-    CExamplePlugin(_In_ IMysticThumbsPluginContext* context) : context(context), config(this)
+    explicit CExamplePlugin(_In_ IMysticThumbsPluginContext* context) : context(context), config(this)
     {
         // Called when the plugin is initially created.
         // It may not necesserally be used immediately, it may just be an object to check the interface information so be careful about allocating anything here.
