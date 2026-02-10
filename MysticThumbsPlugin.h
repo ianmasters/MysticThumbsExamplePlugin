@@ -139,9 +139,11 @@ struct MysticThumbsPluginPing
 struct IMysticThumbsPluginContext : public IMysticThumbsLog
 {
     /// <summary>
-    /// Get the stream we are reading from.
+    /// Get the stream we are reading from. The stream is valid for the lifetime of the plugin instance.
+    /// Note, this is not AddRef'ed so there is no need to Release() it. You could however if you wish
+    /// use a smart pointer such as ATL CComPtr if you wish to manage your usage lifetime of it.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The COM IStream handle.</returns>
     virtual _Check_return_ IStream* GetStream() const = 0;
 
     /// <summary>
@@ -154,8 +156,7 @@ struct IMysticThumbsPluginContext : public IMysticThumbsLog
     /// <summary>
     /// Get the root key the plugin should use to save/load configuration settings to the registry.
     /// Each user gets their own registry settings on a multi-user machine.
-    /// The returned handle should be closed after immediate use with RegCloseKey() to avoid open handles.
-    /// An easier way is to use ATL CRegKey or similar RAII wrapper to manage the handle lifetime in a local context. See the example plugin.
+    /// The returned handle is live for the lifetime of the instance and should NOT be closed with RegCloseKey().
     /// WARNING: This can not be called until after CreateInstance() has been completed. Do not call from a plugin constructor. It will return NULL there.
     /// </summary>
     /// <returns>A registry HKEY root key where your plugin config is stored. NULL if error.</returns>

@@ -2,7 +2,7 @@
 //
 #include "ExamplePlugin.h"
 #include <Shlwapi.h>
-#include <atlbase.h>
+#include <atlbase.h> // include ATL for CComPtr and CComHeapPtr smart pointers to make COM handling easier and less error prone. You can manage COM pointers manually if you prefer, but be sure to release them properly to avoid leaks.
 #include <new>
 #include <filesystem>
 #include <Windows.h>
@@ -87,7 +87,7 @@ private:
 
         void Load(HWND hwndDlg = nullptr) // hwndDlg is only used in the control panel configuration, if provided the dialog controls will be updated. When loading for normal use it will be nullptr.
         {
-            CRegKey hKey(context->GetPluginRegistryRootKey()); // using ATL CRegKey for safe handle management
+            HKEY hKey = context->GetPluginRegistryRootKey();
             if(!hKey)
                 return;
 
@@ -108,7 +108,7 @@ private:
 
         void Save(HWND hwndDlg) const
         {
-            CRegKey hKey(context->GetPluginRegistryRootKey()); // using ATL CRegKey for safe handle management
+            HKEY hKey = context->GetPluginRegistryRootKey();
             if(!hKey)
                 return;
 
