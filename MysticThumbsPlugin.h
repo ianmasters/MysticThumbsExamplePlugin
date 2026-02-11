@@ -283,8 +283,9 @@ public:
     virtual bool GetCapabilities(_Out_ MysticThumbsPluginCapabilities& capabilities) = 0;
 
     /// <summary>
-    /// Allows the plugin to be configured if needed by opening a modal dialog box or similar and storing settings in the registry or a file etc.
+    /// Allows the plugin to be configured if needed by opening a modal dialog box and storing settings in the registry.
     /// </summary>
+    /// <param name="hWndParent">Handle to the parent window for the configuration dialog. It's important to use this for correct Windows behaviour.</param>
     /// <returns>false if nothing was done or configuration is not supported. true if something was done.</returns>
     virtual bool Configure(_In_ HWND hWndParent) = 0;
 
