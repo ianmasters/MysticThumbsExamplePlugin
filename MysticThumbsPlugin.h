@@ -161,6 +161,12 @@ struct IMysticThumbsPluginContext : public IMysticThumbsLog
     /// </summary>
     /// <returns>A registry HKEY root key where your plugin config is stored. NULL if error.</returns>
     virtual _Check_return_ HKEY GetPluginRegistryRootKey() const = 0;
+
+    /// <summary>
+    /// Determines if tooltips are enabled.
+    /// </summary>
+    /// <returns>true if tooltips are enabled in the control panel.</returns>
+    virtual _Check_return_ bool TooltipsEnabled() const = 0;
 };
 
 
