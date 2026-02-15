@@ -45,8 +45,9 @@ if(pPersistFile) {
 class CExamplePlugin : public IMysticThumbsPlugin
 {
 private:
-    // Cache this from CreateInstance() for use through the lifetime of the plugin instance until the end of Destroy().
-    const IMysticThumbsPluginContext* context;
+    // Cache these from CreateInstance() for use through the lifetime of the plugin instance until the end of Destroy().
+    const IMysticThumbsPluginContext* context{};
+    const IMysticThumbsLog* log{};
 
     // Example configuration structure to hold plugin settings and Load/Save to the registry.
     // It doesn't need to be done this way, this example just keeps the configuration code and settings in one place.
@@ -58,7 +59,6 @@ private:
         PluginConfig(CExamplePlugin* plugin)
         {
             context = plugin->GetContext();
-            assert(context);
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -137,6 +137,7 @@ public:
     {
         // Called when the plugin is initially created.
         // It may not necesserally be used immediately, it may just be an object to check the interface information so be careful about allocating anything here.
+        log = context->Log();
     }
 
     const IMysticThumbsPluginContext* GetContext() const
@@ -207,7 +208,7 @@ private:
         ping.height = isQuickView && ping.requestedHeight ? ping.requestedHeight : 256;
         ping.bitDepth = 32;
 
-        context->logf(L"ExamplePlugin: PingImage called, returning %ux%u @ %u bpp", ping.width, ping.height, ping.bitDepth);
+        log->logf(L"ExamplePlugin: PingImage called, returning %ux%u @ %u bpp", ping.width, ping.height, ping.bitDepth);
 
         return true;
     }
@@ -229,8 +230,8 @@ private:
     bool Configure(_In_ HWND hWndParentDialog) override
     {
 #ifdef _DEBUG
-        context->log(L"ExamplePlugin: Configure log called");
-        context->logf(L"ExamplePlugin: Configure logf called with %f", 1.618f);
+        log->log(L"ExamplePlugin: Configure log called");
+        log->logf(L"ExamplePlugin: Configure logf called with %f", 1.618f);
 #endif // _DEBUG
 
         INT_PTR result = DialogBoxParamW(g_hModule,
@@ -310,7 +311,7 @@ private:
 
         *lplpOutputImage = pBitmap.Detach(); // Detach the smart pointer to return the bitmap. It is now owned by the caller process.
 
-        context->logf(L"ExamplePlugin: Generate called, returning %ux%u @ %u bpp", params.desiredWidth, params.desiredHeight, 32);
+        log->logf(L"ExamplePlugin: Generate called, returning %ux%u @ %u bpp", params.desiredWidth, params.desiredHeight, 32);
 
         return hr;
     }

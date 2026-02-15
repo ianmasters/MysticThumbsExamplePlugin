@@ -30,6 +30,19 @@
 //            LocalAlloc / StrDup no longer needed for GetName, GetExtension
 //              etc. calls. Strings are copied by the caller.
 // 
+// 
+// 
+// !!! A NOTE ON DEPLOYMENT OF YOUR .mtp AND ASSOCIATED DLLs !!!
+// 
+// This is a suggestion, not a hard rule but it will help your plugins load when they may be dependent on other DLLs.
+// 
+// In the Plugins folder, either for the current user or all users, create two folders:
+// One named "32" and one named "64".
+// Put your respective 32 bit and 64 bit plugin DLLs in these folders ALONG SIDE any dependencies they may need.
+// This will keep the 32 and 64 bit plugins separated and ensure that loading by higher security processes such as StartMenuExperienceHost.exe works correctly.
+// The dependent DLLs should all be in the same folder as the .mtp plugin DLL to ensure loading in high security processes
+// such as sandboxed / Windows Store or system applications (such as StartMenuExperienceHost.exe).
+// 
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -136,7 +149,7 @@ struct MysticThumbsPluginPing
 //
 /////////////////////////////////////////////////////////////////////////////
 
-struct IMysticThumbsPluginContext : public IMysticThumbsLog
+struct IMysticThumbsPluginContext
 {
     /// <summary>
     /// Get the stream we are reading from. The stream is valid for the lifetime of the plugin instance.
@@ -167,6 +180,19 @@ struct IMysticThumbsPluginContext : public IMysticThumbsLog
     /// </summary>
     /// <returns>true if tooltips are enabled in the control panel.</returns>
     virtual _Check_return_ bool TooltipsEnabled() const = 0;
+
+    /// <summary>
+    /// Determines if dark mode is enabled for the current process.
+    /// This may be useful for configuration dialogs or possibly even thumbnail generation if you want to match the system theme.
+    /// </summary>
+    /// <returns>true if the process is detected as being in dark mode.</returns>
+    virtual _Check_return_ bool IsDarkMode() const = 0;
+
+    /// <summary>
+    /// Get the logging interface for this plugin instance.
+    /// </summary>
+    /// <returns>The logging interface </returns>
+    virtual _Check_return_ const IMysticThumbsLog* Log() const = 0;
 };
 
 
