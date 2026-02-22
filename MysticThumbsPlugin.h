@@ -31,6 +31,12 @@
 //              etc. calls. Strings are copied by the caller.
 // 
 // 
+// Visual Studio / C++ / ATL and implementation notes:
+// - Try to use CComPtr smart pointers for COM interfaces such as IStream, IWICBitmapSource, etc. to manage lifetimes and avoid leaks.
+// - Use CRegKey to manage registry keys and values for configuration storage. This is a simple wrapper around the Windows registry API that provides some convenience functions and RAII semantics.
+// -- Don't cache registry values because they may change between calls to Generate() or Ping(). Instead, read from the registry as needed in these functions to ensure you have the latest values. CRegKey makes this easy and efficient.
+// - Use the logging interface provided by MysticThumbs via the plugin context for logging. This ensures that your logs are integrated with MysticThumbs' logging system and appear in the correct order relative to other log messages.
+// - Generate() can return a bitmap not in BGRA or PBGRA format, so you can avoid manual swizzling and format conversions. MysticThumbs will take care of it.
 // 
 // !!! A NOTE ON DEPLOYMENT OF YOUR .mtp AND ASSOCIATED DLLs !!!
 // 
@@ -171,6 +177,8 @@ struct IMysticThumbsPluginContext
     /// Each user gets their own registry settings on a multi-user machine.
     /// The returned handle is live for the lifetime of the instance and should NOT be closed with RegCloseKey().
     /// WARNING: This can not be called until after CreateInstance() has been completed. Do not call from a plugin constructor. It will return NULL there.
+    /// NOTE: Highly recommended you use atlbase.h / CRegKey 'smart objects' to manage your registry values and sub-key / values from this base.
+    ///       See the ATL documentation for more details.
     /// </summary>
     /// <returns>A registry HKEY root key where your plugin config is stored. NULL if error.</returns>
     virtual _Check_return_ HKEY GetPluginRegistryRootKey() const = 0;
