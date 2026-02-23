@@ -223,7 +223,7 @@ private:
     bool GetCapabilities(_Out_ MysticThumbsPluginCapabilities& capabilities) override
     {
         capabilities = {};
-        capabilities |= PluginCapabilities_CanConfigure | PluginCapabilities_CanNonUniformSize;
+        capabilities |= PluginCapabilities_CanConfigure | PluginCapabilities_CanNonUniformSize | PluginCapabilities_IsProcedural;
         return true;
     };
 
