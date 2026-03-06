@@ -8,6 +8,6 @@
     </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArgumentsHistory>"C:\Program Files\MysticCoder\MysticThumbs\MysticThumbsControlPanel.exe"|</LocalDebuggerCommandArgumentsHistory>
-    <LocalDebuggerCommand>"C:\Program Files\MysticCoder\MysticThumbs\MysticThumbsControlPanel.exe"</LocalDebuggerCommand>
+    <LocalDebuggerCommand>"C:\Program Files\MysticCoder\MysticThumbs\MysticThumbs.exe"</LocalDebuggerCommand>
   </PropertyGroup>
 </Project>

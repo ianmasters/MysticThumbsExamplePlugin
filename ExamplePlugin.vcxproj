@@ -205,7 +205,6 @@
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ExamplePlugin.h" />
     <ClInclude Include="MysticThumbsPlugin.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

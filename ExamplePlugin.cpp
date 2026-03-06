@@ -1,10 +1,10 @@
 // ExamplePlugin.cpp : Defines the exported functions for the MysticThumbs plugin.
 //
-#include "ExamplePlugin.h"
 #include <Shlwapi.h>
 #include <atlbase.h> // include ATL for CComPtr and CComHeapPtr smart pointers to make COM handling easier and less error prone. You can manage COM pointers manually if you prefer, but be sure to release them properly to avoid leaks.
 #include <new>
 #include <filesystem>
+#include <atomic>
 #include <Windows.h>
 #include <assert.h>
 #include "MysticThumbsPlugin.h" // this should be in the example source
@@ -13,6 +13,8 @@
 #ifndef PI
 #define PI 3.14159265358979f
 #endif
+
+static std::atomic_int s_instanceCount;
 
 // Define a name and the extensions supported by this plugin
 static const LPCWSTR s_name = L"Example Plugin";
@@ -129,6 +131,10 @@ protected:
     {
         // Called when the plugin is being destroyed.
         // Free any allocated resources here.
+
+        if(--s_instanceCount == 0) {
+            // Do global deinitialization here if needed after last instance destroyed.
+        }
     }
 
 public:
@@ -389,24 +395,24 @@ INT_PTR CALLBACK CExamplePlugin::ConfigureDialogProc(HWND hwndDlg, UINT uMsg, WP
 
 
 // Return the version of the plugin compiled.
-extern "C" EXAMPLEPLUGIN_API int Version()
+extern "C" __declspec(dllexport) int Version()
 {
     return MYSTICTHUMBS_PLUGIN_VERSION;
 }
 
 // Initialize the plugin. Perform any work here that needs to be done for all instances such as loading DLLs or initializing globals.
-extern "C" EXAMPLEPLUGIN_API bool Initialize()
-{
-    // For this example we don't need to do anything
-    return true;
-}
+//extern "C" __declspec(dllexport) bool Initialize()
+//{
+//    // For this example we don't need to do anything
+//    return true;
+//}
 
 // Shutdown the plugin. Clean everything up.
-extern "C" EXAMPLEPLUGIN_API bool Shutdown()
-{
-    // For this example we don't need to do anything
-    return true;
-}
+//extern "C" __declspec(dllexport) bool Shutdown()
+//{
+//    // For this example we don't need to do anything
+//    return true;
+//}
 
 /// <summary>
 /// Create an instance of a thumbnail plugin.
@@ -414,8 +420,13 @@ extern "C" EXAMPLEPLUGIN_API bool Shutdown()
 /// </summary>
 /// <param name="context">Instance specific context. May be cached and used until the end of Destroy().</param>
 /// <returns>A new instance of this plugin.</returns>
-extern "C" EXAMPLEPLUGIN_API IMysticThumbsPlugin* CreateInstance(_In_ IMysticThumbsPluginContext* context)
+extern "C" __declspec(dllexport) IMysticThumbsPlugin* CreateInstance(_In_ IMysticThumbsPluginContext* context)
 {
+    // If required track instance counts for "global" initialization
+    if(s_instanceCount++ == 0) {
+        // Do initialization stuff
+    }
+
     // Be sure to use CoTaskMemAlloc and placement new to create your object so it is within
     // the processes memory space or it may end up being in protected memory if the DLL shuts down.
     // For other allocations, also use CoTaskMemAlloc and CoTaskMemFree as needed to best avoid memory issues.
@@ -430,7 +441,7 @@ extern "C" EXAMPLEPLUGIN_API IMysticThumbsPlugin* CreateInstance(_In_ IMysticThu
 // Prevent loading when in a debug process if this is not a debug build, and vice versa.
 // You can also choose to not export this function if you don't need it, or just for release builds if you always want it to load.
 // You could also check for other dependencies here if needed.
-extern "C" EXAMPLEPLUGIN_API bool PreventLoading(bool isDebugProcess)
+extern "C" __declspec(dllexport) bool PreventLoading(bool isDebugProcess)
 {
 #ifdef _DEBUG
     bool isDebug = true;
@@ -444,7 +455,7 @@ extern "C" EXAMPLEPLUGIN_API bool PreventLoading(bool isDebugProcess)
 
 // Very important DllMain info: Don't use any non- Kernel32.dll calls in here. It's dangerous and strictly prohibited.
 // If you want to check this - research DllMain in the MSDN docs to see what you should and should not do here.
-EXAMPLEPLUGIN_API BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD ul_reason_for_call, void* lpReserved)
+__declspec(dllexport) BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD ul_reason_for_call, void* lpReserved)
 {
     UNREFERENCED_PARAMETER(lpReserved);
 
