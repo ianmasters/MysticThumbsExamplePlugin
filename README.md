@@ -1,5 +1,11 @@
 # MysticThumbs example plugin
 
+This repository is provided under the MIT license as a standalone example
+plugin project. It is separate from the commercial MysticThumbs product, and
+use, forking, or modification of this example code does not imply support,
+endorsement, warranty, or liability for MysticThumbs or its commercial
+offering. See `LICENSE` for details.
+
 ## Add new image formats to MysticThumbs
 
 ## How to use
