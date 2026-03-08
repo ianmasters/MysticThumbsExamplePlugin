@@ -7,7 +7,12 @@
 // 
 // This file and the associated example plugin project can be found at:
 // https://github.com/ianmasters/MysticThumbsExamplePlugin
+// Please read the LICENSE file found there for the terms under which this code is licensed.
 //
+// 
+// This code is provided as an example and template for creating MysticThumbs plugins.
+// 
+// 
 // This file is the primary interface header for MysticThumbs plugins.
 // It should not be modified or redistributed in any way.
 // Please see the MysticThumbs license.
