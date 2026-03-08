@@ -2,8 +2,11 @@
 // 
 // Header for MysticThumbs plugins
 // 
-// Copyright 2011 MysticCoder
+// Copyright 2011-2026 MysticCoder
 // http://mysticcoder.net/mysticthumbs
+// 
+// This file and the associated example plugin project can be found at:
+// https://github.com/ianmasters/MysticThumbsExamplePlugin
 //
 // This file is the primary interface header for MysticThumbs plugins.
 // It should not be modified or redistributed in any way.
