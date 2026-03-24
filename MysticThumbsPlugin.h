@@ -14,8 +14,10 @@
 // 
 // 
 // This file is the primary interface header for MysticThumbs plugins.
-// It should not be modified or redistributed in any way.
-// Please see the MysticThumbs license.
+// It should not be modified, however redistribution in the form of a copy to another
+// repository for use in compilation at a specific version is acceptable as long as
+// the license conditions are met.
+// Please see the MysticThumbs license for reference.
 // 
 // 2024-12-27 - Bumped MYSTICTHUMBS_PLUGIN_VERSION to 2.
 // Added Version() DLL function for plugins to report their version.
