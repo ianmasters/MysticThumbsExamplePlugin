@@ -30,6 +30,7 @@ static HMODULE g_hModule;
 
 // Added in VERSION 3.
 // If you need the full path of the file being read you can query the IStream for IPersistFile.
+// In order to get this for sure, add the flag PluginCapabilities_RequiresStreamPath to your GetCapabilities() result. 
 // Note that this may not always be available and may not be the full path depending on how the stream was created, but it should be.
 #if 0
 #include <atlbase.h> // to get the smart pointers

@@ -233,6 +233,8 @@ enum MysticThumbsPluginCapabilities : unsigned int
     PluginCapabilities_CanConfigure = 0x00000001, // Supports Configure() to allow configuration of the plugin
     PluginCapabilities_CanNonUniformSize = 0x00000010, // Allows resizing to in QuickView without locking aspect ratio. Should only be set if the plugin can handle non-square thumbnails for example computation-generated images or resizable paper-like documents. For normal images this should not be set.
     PluginCapabilities_IsProcedural = 0x00000020, // Indicates this plugin generates procedural images. Useful for QuickView to automatically refresh when resized and some other things. For normal images this should not be set.
+    PluginCapabilities_IsVideo = 0x00000040, // Indicates this plugin generates video files. This is a helper for adornments within Windows Explorer.
+    PluginCapabilities_RequiresStreamPath = 0x00000100, // Indicates that the plugins stream requires a file path as part of the stream so other files relative to the same file directory can be used to generate the thumbnail as a compound file.
 };
 DEFINE_ENUM_FLAG_OPERATORS(MysticThumbsPluginCapabilities)
 
